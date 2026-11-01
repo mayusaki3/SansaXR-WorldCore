@@ -45,3 +45,27 @@ Design proposal for SansaXR-WorldCore develop. Not yet approved as canonical spe
 - Whether Connected and Broadcast modes can coexist across B zones within one event.
 - Whether A can initiate bidirectional physical interactions with selected audience, requiring cross-instance interaction authority.
 - Live system repository and media protocol ownership.
+
+## Decision update — 2026-11-01
+- User selected C: selected B instances are connected bidirectionally to A; all B instances contribute aggregated audience reactions. Other B instances receive A broadcast/projection without direct audience projection to A.
+- User requested optional distribution and synchronization of A-side gimmicks to B at connection/broadcast start.
+
+## Proposed gimmick distribution and synchronization (not yet approved)
+- `GimmickPackage`: versioned immutable manifest, hash, dependencies, required capabilities and execution permissions.
+- `GimmickBinding`: maps abstract stage/lighting/audience targets from A to concrete targets in each B; supports different venue layouts.
+- `GimmickState`: per-B authoritative execution state with event clock position and source epoch.
+- `GimmickEvent`: authenticated command ID, source epoch, event timestamp, target binding, operation and parameters.
+- On join: validate package/rights/capabilities -> distribute hash-verified package/assets -> bind to B -> apply snapshot -> replay missing events -> activate scheduled execution.
+- During performance: A controls timeline and issues commands; each B validates, executes locally and ACKs; stale epochs and duplicate IDs are rejected.
+- On A failover: reconcile source epoch and timeline before accepting new commands; old A cannot operate B.
+- Initial PoC should synchronize declarative definitions and bounded commands. Arbitrary scripts must not execute in B without sandboxing, capability control and resource quotas.
+- Package distribution does not automatically grant viewers access to paid/private assets; access policy and SansaSphere rights remain separate.
+
+## Additional test proposals
+- GSYNC-001: identical package hash is not downloaded again.
+- GSYNC-002: mismatched hash or missing dependency blocks activation.
+- GSYNC-003: A gimmick target binds to different B venue layouts.
+- GSYNC-004: reconnect applies snapshot and missing events without duplicate effects.
+- GSYNC-005: delayed event from old A source epoch is rejected.
+- GSYNC-006: package lacking permitted capability cannot execute.
+- GSYNC-007: connected and broadcast B receive consistent timeline effects while A only sees selected B audience.
